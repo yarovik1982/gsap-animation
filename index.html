@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>VIDEO Fire Animation</title>
+   <style>
+      body {
+         margin: 0;
+         font-family: Arial, sans-serif;
+         background: #000;
+         color: white;
+      }
+
+      .content {
+         padding: 50px;
+         text-align: center;
+         background: linear-gradient(to bottom, #111, #000);
+      }
+
+      h1 {
+         font-size: 3rem;
+         margin-bottom: 20px;
+         color: #ff6600;
+         text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+      }
+
+      p {
+         font-size: 1.2rem;
+         max-width: 800px;
+         margin: 0 auto 40px;
+         line-height: 1.6;
+         color: #ccc;
+      }
+
+      .video-container {
+         position: relative;
+         width: 100%;
+         height: 100vh;
+         overflow: hidden;
+      }
+
+      .background-video {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         transform-origin: center center;
+      }
+
+      /* Упрощенный оверлей без шума */
+      .video-overlay {
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+         pointer-events: none;
+      }
+
+      .more-content {
+         padding: 100px 50px;
+         background: #000;
+         text-align: center;
+         font-size: 1.5rem;
+      }
+
+      .fire-text {
+         color: #ff6600;
+         font-weight: bold;
+         text-shadow: 0 0 10px rgba(255, 102, 0, 0.5);
+      }
+
+      .scroll-hint {
+         position: absolute;
+         bottom: 40px;
+         left: 50%;
+         transform: translateX(-50%);
+         color: #fff;
+         /* color: #ff6600; */
+         font-size: 1rem;
+         animation: bounce 2s infinite;
+         z-index: 10;
+         background: rgba(0, 0, 0, 0.7);
+         padding: 10px 20px;
+         border-radius: 20px;
+         border: 1px solid #ff6600;
+      }
+
+      @keyframes bounce {
+
+         0%,
+         100% {
+            transform: translateX(-50%) translateY(0);
+         }
+
+         50% {
+            transform: translateX(-50%) translateY(-10px);
+         }
+      }
+   </style>
+</head>
+
+<body>
+   <div class="content">
+      <h1>🔥 Анимация огня</h1>
+      <p>Прокрутите вниз, чтобы увидеть анимацию огня. Видео будет плавно появляться и усиливаться по мере прокрутки.</p>
+   </div>
+
+   <div class="video-container">
+      <video class="background-video" muted loop playsinline preload="auto">
+         <source src="fire-animation.webm" type="video/webm">
+         <source src="fire-animation.mp4" type="video/mp4">
+      </video>
+      <div class="video-overlay"></div>
+      <!-- <div class="scroll-hint">Scroll down to intensify the fire</div> -->
+   </div>
+
+   <!-- <div class="more-content">
+      <h2>Fire Burns Bright</h2>
+      <p>The <span class="fire-text">flames dance</span> as you continue your journey...</p>
+      <div style="height: 800px; display: flex; align-items: center; justify-content: center;">
+         <div>
+            <h3 style="color: #ff9900;">The End of Fire Section</h3>
+            <p>You've scrolled through the fire animation completely.</p>
+         </div>
+      </div>
+   </div>  -->
+
+   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/gsap.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.1/dist/ScrollTrigger.min.js"></script>
+
+   <script>
+      gsap.registerPlugin(ScrollTrigger);
+
+      document.addEventListener('DOMContentLoaded', function () {
+         const video = document.querySelector('.background-video');
+         const videoContainer = document.querySelector('.video-container');
+
+         if (!video) return;
+
+         video.pause();
+
+         gsap.timeline({
+            scrollTrigger: {
+               trigger: videoContainer,
+               start: "top top",
+               end: "+=1200",
+               scrub: true,
+               pin: true,
+               onEnter: () => {
+                  video.play().catch(e => console.log("Video play:", e));
+               },
+               onLeaveBack: () => {
+                  video.pause();
+               }
+            }
+         })
+            .fromTo(video,
+               { scale: 0.7, opacity: 0.3, filter: "brightness(0.7) blur(5px)" },
+               { scale: 1, opacity: 1, filter: "brightness(1.5) blur(0px)", duration: 1 }
+            )
+            .to(video, {
+               filter: "brightness(2) contrast(1.5) saturate(2)",
+               duration: 0.8
+            }, "-=0.5");
+
+         gsap.fromTo('.video-overlay',
+            { opacity: 0.8 },
+            {
+               opacity: 0.3,
+               duration: 1.5,
+               scrollTrigger: {
+                  trigger: videoContainer,
+                  start: "top top",
+                  end: "+=1000",
+                  scrub: true
+               }
+            }
+         );
+
+         gsap.to('.scroll-hint', {
+            opacity: 0,
+            duration: 0.5,
+            scrollTrigger: {
+               trigger: videoContainer,
+               start: "top 80%",
+               end: "top 20%",
+               scrub: true
+            }
+         });
+      });
+   </script>
+</body>
+
+</html>
